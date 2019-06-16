@@ -1,0 +1,19 @@
+Input	Initial	Has	Number	AvgTime	AvgTime
+Size	Order	Dups	of runs	forusel	forsort
+5000	random	no	10	0.075 s	0.010 s
+5000	sorted	no	10	0.008 s	0.010 s
+5000	reverse	no	10	0.008 s 0.010 s
+5000	random	yes	10	0.073 s	0.010 s
+5000	sorted	yes	10	0.011 s	0.010 s
+5000	reverse	yes	N	0.011 s	0.010 s
+10000	random	no	N	0.293 s	0.016 s
+10000	sorted	no	N	0.011 s	0.016 s
+10000	reverse	no	N	0.011 s 0.015 s
+10000	random	yes	N	0.290 s	0.016 s
+10000	sorted	yes	N	0.021 s	0.016 s
+10000	reverse	yes	N	0.019 s	0.016 s
+
+
+It can be seen that UNIX sort command gives a very constant average time regardless of the order. This is because UNIX sort uses a variation of merge sort (R-Way merge). Merge sort leverages the idea of recursion. By breaking down large array of numbers into smaller chucks and sort them, this sorting algorithm produces very fast sort (nlogn) of the expense of larger memory required to store the chucks. As merge sort has to go through the list regardless of the initial order, the average time for sort is consistent.
+
+As for IntList.c sorting algorithm, it uses sorting algorithm similar to insertion sort (but optimised for reversed order). The algorithm works well with the list is already sorted, since the sort does not have to go through the list to have it sorted. This would produce the best case scenario for this type of sort, which is even faster than UNIX merge sort (n). When the list is random, the algorithm has to iterate through the list and shift the element as necessary, making it slower compared to UNIX Sort command (n^2).
