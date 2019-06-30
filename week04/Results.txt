@@ -7,17 +7,26 @@ Depth = depth of tree, Cost = average #comparisons per search
 Insert
 Method       Depth      Cost     Depth      Cost     Depth      Cost
 
-L         ________  ________  ________  ________  ________  ________
+L         	5000  		3114		13 		12    		28		16
 
-A         ________  ________  ________  ________  ________  ________
+A         	5000  		1886  		2954  	1115  		28  	16
 
-R         ________  ________  ________  ________  ________  ________
+R         	2492		952			1774	674			26		15
 
-B         ________  ________  ________  ________  ________  ________
+B         	206  		63  		20  	14  		24  	13
 
-S         ________  ________  ________  ________  ________  ________
+S         	33  		24  		29  	24  		1154  	23
 
-V         ________  ________  ________  ________  ________  ________
+V         	13  		12  		14  	12  		15  	12
 
 
 Notes (what the above indicates):
+Seach using L and A method are quite inefficient as their algorithm is rather similar to those of linked list.
+
+Prefix insert does not have high cost as the reuslting tree is balanced. Similarly, random order insert usually reuslts in a self-balanced tree, thus, the low cost.
+
+B, insert at leaves, but periodically rebalance the tree, ensures balaced tree, making search less costly, compared to the L and A methods.
+
+Sprey tree ensures that the newly inserted node is always the root making search less cosly.
+
+AVL tree is self-balaced, thus, making it the most efficient way of searching O(log2 n).
