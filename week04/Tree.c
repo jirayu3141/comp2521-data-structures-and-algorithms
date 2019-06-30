@@ -170,9 +170,11 @@ void TreeInsert (Tree t, Item it)
 // Helpers: various styles of insert
 static Link insert (Link t, Item it)
 {
-	if (t == NULL) return newNode (it);
-	int diff = cmp (key (it), key (t->value));
-	if (diff == 0)      t->value = it;
+	if (t == NULL) return newNode (it);	//create new tree with 'it' in it.
+
+	int diff = cmp (key (it), key (t->value));	//>0 if it is more than value
+	t->within->ncompares++;
+	if (diff == 0)      t->value = it;	//replace current node with new 'it'
 	else if (diff <  0) t->left  = insert (t->left,  it);
 	else if (diff  > 0) t->right = insert (t->right, it);
 	return t;
@@ -182,6 +184,7 @@ static Link insertAtRoot (Link t, Item it)
 {
 	if (t == NULL) return newNode (it);
 	int diff = cmp (key (it), key (t->value));
+	t->within->ncompares++;
 	if (diff == 0) {
 		t->value = it;
 	} else if (diff < 0) {
@@ -226,17 +229,20 @@ static Link insertSplay (Link t, Item it)
 
 	Key v = key (it);
 	int diff = cmp (v, key (t->value));
-
+	t->within->ncompares++;
 	if (diff == 0) {
 		t->value = it;
 
 	} else if (diff < 0) {
+
 		if (t->left == NULL) {
 			t->left = newNode (it);
 		} else if (less (v, key (t->left->value))) {
+			t->within->ncompares++;
 			t->left->left = insertSplay (t->left->left, it);
 			t = rotateR (t);
 		} else {
+			t->within->ncompares++;
 			t->left->right = insertSplay (t->left->right, it);
 			t->left = rotateL (t->left);
 		}
@@ -247,13 +253,14 @@ static Link insertSplay (Link t, Item it)
 		if (t->right == NULL) {
 			t->right = newNode (it);
 		} else if (less (key (t->right->value), v)) {
+			t->within->ncompares++;
 			t->right->right = insertSplay (t->right->right, it);
 			t = rotateL (t);
 		} else {
+			t->within->ncompares++;
 			t->right->left = insertSplay (t->right->left, it);
 			t->right = rotateR (t->right);
 		}
-
 		t = rotateL (t);
 	}
 
@@ -264,6 +271,7 @@ static Link insertAVL (Link t, Item it)
 {
 	if (t == NULL) return newNode (it);
 	int diff = cmp (key (it), key (t->value));
+	t->within->ncompares++;
 	if (diff == 0)     t->value = it;
 	else if (diff < 0) t->left  = insertAVL (t->left, it);
 	else if (diff > 0) t->right = insertAVL (t->right, it);
@@ -295,6 +303,7 @@ static Link search (Link t, Key k)
 		return NULL;
 	Link res = NULL;
 	int diff = cmp (k, t->value);
+	t->within->ncompares++;
 	if (diff == 0)
 		res = t;
 	else if (diff < 0)
@@ -313,21 +322,27 @@ static Link searchSplay (Link t, Key k, int *found)
 		res = NULL;
 	} else if (eq (key (t->value), k)) {
 		*found = 1; // item found, store true
+		t->within->ncompares++;
 		res = t;
 	} else if (less (k, key (t->value))) {
+		t->within->ncompares++;
 		if (t->left == NULL) {
 			*found = 0; // item not found
 			// res = rotateRight(t);
 			res = t;
 		} else if (eq (key (t->left->value), k)) {
+			t->within->ncompares++;
 			*found = 1;
 			res = rotateR (t);
 		} else {
+			t->within->ncompares++;
 			if (less (k, key (t->left->value))) {
+				t->within->ncompares++;
 				// left-left
 				t->left->left = searchSplay (t->left->left, k, found);
 				t = rotateR (t);
 			} else {
+				t->within->ncompares++;
 				// left-right
 				t->left->right = searchSplay (t->left->right, k, found);
 				t->left = rotateL (t->left);
@@ -335,21 +350,25 @@ static Link searchSplay (Link t, Key k, int *found)
 			res = rotateR (t);
 		}
 	} else { // k > key(t->value)
+		t->within->ncompares++;
 		if (t->right == NULL) {
 			*found = 0; // item not found
 			// res = rotateLeft(t);
 			res = t;
 		} else if (eq (key (t->right->value), k)) {
+			t->within->ncompares++;
 			*found = 1;
 			res = rotateL (t);
 		} else {
 			if (less (key (t->right->value), k)) {
 				/* right-right */
+				t->within->ncompares++;
 				t->right->right =
 					searchSplay (t->right->right, k, found);
 				t = rotateL (t);
 			} else {
 				/* right-left */
+				t->within->ncompares++;
 				t->right->left = searchSplay (t->right->left, k, found);
 				t->right = rotateR (t->right);
 			}
@@ -371,6 +390,7 @@ static Link delete (Link t, Key k)
 	if (t == NULL)
 		return NULL;
 	int diff = cmp (k, t->value);
+	t->within->ncompares++;
 	if (diff == 0)
 		t = deleteRoot (t);
 	else if (diff < 0)
@@ -449,11 +469,17 @@ static Link partition (Link t, int i)
 // Helper: rotate tree left around root
 static Link rotateL (Link n2)
 {
+	//empty node
 	if (n2 == NULL) return NULL;
+	//create temp link (child)
 	Link n1 = n2->right;
+	//empty child
 	if (n1 == NULL) return n2;
+	//make left of child equal to the right of ex-root
 	n2->right = n1->left;
+	//make the previous root the new child
 	n1->left = n2;
+	n2->within->nrotates++;
 	return n1;
 }
 
@@ -465,6 +491,7 @@ static Link rotateR (Link n1)
 	if (n2 == NULL) return n1;
 	n1->left = n2->right;
 	n2->right = n1;
+	n1->within->nrotates++;
 	return n2;
 }
 
