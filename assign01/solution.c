@@ -39,7 +39,6 @@ TfIdfList checktfIdfNode(TfIdfList t, char * filecheck);
 TfIdfList duplicatetdidfnode(TfIdfList original);
 TfIdfList sorttdidf(TfIdfList orginal, TfIdfList addonto);
 
-
 //This function normalises a word and check the final letter
 //to see if specific character and decides if it is deleted
 char * normaliseWord(char *tobenormalised){

@@ -92,7 +92,8 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
     return wordTree;
 }
 
-TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D) {
+TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D)
+{
       InvertedIndexBST wordNode = BSTreeFind(tree, searchWord);
   if(wordNode == NULL){
     return NULL;
@@ -119,9 +120,11 @@ TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D) {
     return sorted;
   }
 }
-TfIdfList retrieve(InvertedIndexBST tree, char* searchWords[] , int D) {
-int num_of_search_words = 0;
-    while(searchWords[num_of_search_words] != NULL){
+
+TfIdfList retrieve(InvertedIndexBST tree, char* searchWords[] , int D) 
+{
+    int num_of_search_words = 0;
+    while(searchWords[num_of_search_words] != NULL) {
         num_of_search_words++;
     }
 
@@ -341,6 +344,17 @@ void showBSTreeNodeandList(InvertedIndexBST t, FILE *output)
   }
   fprintf(output, "\n");
 }
+//Duplicates a tfidf node to allow it to be sorted
+TfIdfList duplicatetdidfnode(TfIdfList original){
+  TfIdfList replicate = malloc(sizeof(struct TfIdfNode));
+  assert(replicate != NULL);
+  replicate->filename = malloc(strlen(original->filename)*sizeof(char));
+  strcpy(replicate->filename, original->filename);
+  replicate->tfidf_sum = original->tfidf_sum;
+  replicate->next = NULL;
+  return replicate;
+
+}
 
 //Calculates the tfidf of a specific tfidf node
 double calcsingleTfIdfsum(double tf, int D, double numoffiles){
@@ -406,17 +420,6 @@ TfIdfList sorttdidf(TfIdfList original, TfIdfList addonto){
     return addonto;
 }
 
-//Duplicates a tfidf node to allow it to be sorted
-TfIdfList duplicatetdidfnode(TfIdfList original){
-  TfIdfList replicate = malloc(sizeof(struct TfIdfNode));
-  assert(replicate != NULL);
-  replicate->filename = malloc(strlen(original->filename)*sizeof(char));
-  strcpy(replicate->filename, original->filename);
-  replicate->tfidf_sum = original->tfidf_sum;
-  replicate->next = NULL;
-  return replicate;
-
-}
 
 //Checks if a tdidf node with the same filename already exist within
 //the tdidf list that is to be returned
