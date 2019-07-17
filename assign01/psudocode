@@ -1,0 +1,13 @@
+psudocode:
+
+- create a struct containging all words and number of occurace.
+
+
+1. read all the name of the file and one by one, store it in an array
+2. following the file list from the start, access the file using the filename
+3. count the number of words in the file
+4. loop through the file
+    - if a new word is found, add it to the tree.
+    - caluclate the tf for that word and put it in
+    - if the same word repeats itself, update the tf for that word
+
