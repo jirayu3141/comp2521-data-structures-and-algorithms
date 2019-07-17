@@ -5,7 +5,8 @@ CFLAGS	= -Wall  -std=gnu11 -g
 .PHONY: all
 all: invertedIndex
 
-invertedIndex: main.c invertedIndex.o
+invertedIndex: main.c WordTree.o
+WordTree.o: WordTree.h WordTree.c invertedIndex.h
 invertedIndex.o: invertedIndex.c
 
 

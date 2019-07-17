@@ -37,8 +37,8 @@ void testNormalise(){
 int main() {
         //testNormalise(); 
 
-		generateInvertedIndex("collection.txt");
-
+		InvertedIndexBST invertedTree =  generateInvertedIndex("collection.txt");
+		printInvertedIndex(invertedTree); 
 
     return 0;
 }   

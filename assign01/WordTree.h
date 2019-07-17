@@ -4,9 +4,11 @@
 
 #include "invertedIndex.h"
 
-//insert word into Tree
-void TreeInsert(InvertedIndexBST, char*);
+WordInsert(InvertedIndexBST, char*);
 InvertedIndexBST newNode (char*);
-
+void BSTreeInfix(InvertedIndexBST t);
+void showBSTreeNode(InvertedIndexBST t);
+InvertedIndexBST newBSTree(void);
+InvertedIndexBST BSTreeFind(InvertedIndexBST t, char *inputword);
 
 #endif

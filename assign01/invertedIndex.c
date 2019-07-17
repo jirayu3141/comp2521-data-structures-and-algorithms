@@ -1,6 +1,6 @@
 // Written by Jirayu Sirivorawong, June 2019
 #include "invertedIndex.h"
-//#include "WordTree.h"
+#include "WordTree.h"
 
 #include <assert.h>
 #include <err.h>
@@ -10,7 +10,7 @@
 #include <sysexits.h>
 #include <string.h>
 #include <ctype.h>
-
+#include <stdbool.h>
 #define MAX_FILE 1000
 #define BUF_SIZE 1000
 
@@ -18,10 +18,16 @@
 void removeSpaces(char *str);
 char* ReadFile(char *filename);
 int storeTokenToArray(char *content, char**);
+int fileNodeExist(InvertedIndexBST, char *);
 //tree functions
-static InvertedIndexBST WordInsert(InvertedIndexBST, char*);
-InvertedIndexBST newNode (char*);
 
+//degug
+double calculatetf(char *file, char *word);
+void addFileNode(InvertedIndexBST indexWordNode, FileList fileNode);
+FileList newFileNode(char *inputfile);
+void fileNodeInsert(InvertedIndexBST indexWordNode, FileList fileNode);
+void infix(InvertedIndexBST tree, FILE *output);
+void showBSTreeNodeandList(InvertedIndexBST t, FILE *output);
 char * normaliseWord(char *str) 
 {
     //removeing leading and trailing spaces
@@ -43,7 +49,7 @@ char * normaliseWord(char *str)
 InvertedIndexBST generateInvertedIndex(char *collectionFilename) 
 {
     //create a new tree to store all words
-    InvertedIndexBST wordTree;
+    InvertedIndexBST wordTree = newBSTree();
     
     //collection_content has the file contents
     char *collection_content = ReadFile(collectionFilename);
@@ -51,26 +57,43 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
     //numFile is the totol number of files in collectionFilename
     int numFile = storeTokenToArray(collection_content, file_names);
    
-    //lets test with one file first
-    //store the text into a temp array
-    char *all_words_in_file = ReadFile(file_names[0]);
-    //array to store each word
-    char* buffer[BUF_SIZE];
-    int numWords = storeTokenToArray(all_words_in_file, buffer);
 
-    //put all the words into tree
-    for (int i = 0; i < numWords; i++) {
-        wordTree = WordInsert(wordTree, buffer[i]);
+    for (int i = 0; i < numFile; i++) {
+        //store the text into a temp array
+        char *all_words_in_file = ReadFile(file_names[i]);
+        //array to store each word
+        char* buffer[BUF_SIZE];
+        int numWords = storeTokenToArray(all_words_in_file, buffer);
+        //put all the words into tree
+        for (int j = 0; j < numWords; j++) {
+            wordTree = WordInsert(wordTree, buffer[j]);
+            //check if the filelist has been inserted
+            int flag = fileNodeExist(BSTreeFind(wordTree, buffer[j]),file_names[i]);
+            //put in the filelist
+            if (flag == false) {
+                FileList newfn = newFileNode(file_names[i]);
+                newfn->tf = calculatetf(file_names[i], buffer[j]);
+                addFileNode(BSTreeFind(wordTree, buffer[j]), newfn);
+            }
+            //FileList newFL = 
+        }
     }
+    //BSTreeInfix(wordTree);
     //if duplicate is found, change the tf
-    for (int i = 0; i < numWords; i++)
-        printf("%s\n", buffer[i]);
-
-
+    // for (int i = 0; i < numWords; i++)
+    //     printf("%s\n", buffer[i]);
     return wordTree;
 }
 
+void printInvertedIndex(InvertedIndexBST tree) {
+    if(tree == NULL) return;
+    FILE *output;
+    output = fopen("invertedIndex.txt", "w");
 
+    infix(tree, output);
+
+    fclose(output);
+}
 
 /*OTERH FUNCTIONS*/
 void removeSpaces(char *str) {
@@ -151,21 +174,103 @@ int storeTokenToArray(char *content, char *destination[]){
 
 /*TREE FUNCTIONS*/
 
-static InvertedIndexBST WordInsert(InvertedIndexBST t, char* word) {
-    if (t == NULL) return newNode (word);   //crete new tree with word in it
-    if (strcmp(word, t->word) < 0) {
-        t->left = WordInsert(t->left, word);
-    } else if (strcmp (word, t->word) > 0) {
-        t->right = WordInsert(t->right, word);
+
+
+
+
+
+
+
+
+
+double calculatetf(char *file, char *word){
+  double tf = 0;
+  double wordcount = 0;
+  double wordpresent = 0;
+  FILE *fff;
+  char infileword[1000];
+  if ((fff = fopen(file,"r")) == NULL) {
+      fprintf(stderr, "Can't open file %s\n", file);
+      return EXIT_FAILURE;
+  }
+  rewind(fff);
+  while(fscanf(fff, "%s", infileword) != EOF){
+    if(strcmp(normaliseWord(infileword), word) == 0){
+      wordpresent++;
     }
-    return t;
+    wordcount++;
+  }
+  fclose(fff);
+  tf = wordpresent/wordcount;
+  return tf;
 }
-InvertedIndexBST newNode (char* word) {
-    struct InvertedIndexNode *new = malloc(sizeof *new);
-    if (new == NULL) err (EX_OSERR, "couldn't allocate Tree node");
-    new->fileList = NULL;
-    new->left = NULL;
-    new->right = NULL;
-    new->word = word;
-    return new;
+
+void addFileNode(InvertedIndexBST indexWordNode, FileList fileNode)
+{
+  if(indexWordNode->fileList == NULL){
+    indexWordNode->fileList = fileNode;
+  }
+  else{
+    fileNodeInsert(indexWordNode, fileNode);
+  }
+}
+
+FileList newFileNode(char *inputfile)
+{
+  FileList new = malloc(sizeof(struct FileListNode));
+  assert(new != NULL);
+  new->filename = malloc(strlen(inputfile)*sizeof(char) + 1);
+  strcpy(new->filename, inputfile);
+  new->tf = 0;
+  new->next = NULL;
+  return new;
+}
+
+void fileNodeInsert(InvertedIndexBST indexWordNode, FileList fileNode){
+
+  FileList itterativepointer = indexWordNode->fileList;
+  if (strcmp(itterativepointer->filename,  fileNode->filename) > 0) {
+    fileNode->next = itterativepointer;
+    indexWordNode->fileList = fileNode;
+    return;
+  }
+  else{
+    while(strcmp(itterativepointer->filename,  fileNode->filename) < 0){
+      if(itterativepointer->next == NULL){
+        itterativepointer->next = fileNode;
+        return;
+      }
+      else if(strcmp(itterativepointer->next->filename,  fileNode->filename) > 0){
+        break;
+      }
+      else{
+        itterativepointer = itterativepointer->next;
+      }
+    }
+    fileNode->next = itterativepointer->next;
+    itterativepointer->next = fileNode;
+    return;
+  }
+
+}
+
+void infix(InvertedIndexBST tree, FILE *output){
+  if(tree == NULL){
+    return;
+  }
+  infix(tree->left, output);
+  showBSTreeNodeandList(tree, output);
+  infix(tree->right, output);
+}
+
+void showBSTreeNodeandList(InvertedIndexBST t, FILE *output)
+{
+	if (t == NULL) return;
+	fprintf(output, "%s ", t->word);
+  FileList itterative = t->fileList;
+  while(itterative != NULL){
+    fprintf(output, "%s ", itterative->filename);
+    itterative = itterative->next;
+  }
+  fprintf(output, "\n");
 }
