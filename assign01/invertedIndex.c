@@ -10,16 +10,17 @@
 #include <sysexits.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #define MAX_FILE 1000
 #define BUF_SIZE 1000
+#define MAX 1000
 
 /*FUNCTION PROTOTYPE */
 void removeSpaces(char *str);
 char* ReadFile(char *filename);
 int storeTokenToArray(char *content, char**);
 int fileNodeExist(InvertedIndexBST, char *);
-//tree functions
 
 //degug
 double calculatetf(char *file, char *word);
@@ -28,6 +29,12 @@ FileList newFileNode(char *inputfile);
 void fileNodeInsert(InvertedIndexBST indexWordNode, FileList fileNode);
 void infix(InvertedIndexBST tree, FILE *output);
 void showBSTreeNodeandList(InvertedIndexBST t, FILE *output);
+TfIdfList addsingleTfIdfNode(TfIdfList addonto, char *file, double tf, int D, int numoffiles);
+TfIdfList checktfIdfNode(TfIdfList t, char * filecheck);
+TfIdfList sorttdidf(TfIdfList orginal, TfIdfList addonto);
+double calcsingleTfIdfsum(double tf, int D, double numoffiles);
+TfIdfList duplicatetdidfnode(TfIdfList original);
+
 char * normaliseWord(char *str) 
 {
     //removeing leading and trailing spaces
@@ -66,7 +73,7 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
         int numWords = storeTokenToArray(all_words_in_file, buffer);
         //put all the words into tree
         for (int j = 0; j < numWords; j++) {
-            wordTree = WordInsert(wordTree, buffer[j]);
+            WordInsert(wordTree, buffer[j]);
             //check if the filelist has been inserted
             int flag = fileNodeExist(BSTreeFind(wordTree, buffer[j]),file_names[i]);
             //put in the filelist
@@ -84,6 +91,75 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
     //     printf("%s\n", buffer[i]);
     return wordTree;
 }
+
+TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D) {
+      InvertedIndexBST wordNode = BSTreeFind(tree, searchWord);
+  if(wordNode == NULL){
+    return NULL;
+  }
+  FileList itterativecounter = wordNode->fileList;
+  double filecounter = 0;
+  while(itterativecounter!=NULL){
+      filecounter++;
+      itterativecounter = itterativecounter->next;
+  }
+
+  if(wordNode == NULL){
+    return NULL;
+  }
+  else{
+    TfIdfList returnvalue = NULL;
+    FileList increment = wordNode->fileList;
+    while(increment != NULL){
+      returnvalue = addsingleTfIdfNode(returnvalue, increment->filename, increment->tf, D, filecounter);
+      increment = increment->next;
+    }
+    TfIdfList sorted = NULL;
+    sorted= sorttdidf(returnvalue, sorted);
+    return sorted;
+  }
+}
+TfIdfList retrieve(InvertedIndexBST tree, char* searchWords[] , int D) {
+int num_of_search_words = 0;
+    while(searchWords[num_of_search_words] != NULL){
+        num_of_search_words++;
+    }
+
+    TfIdfList retrievetfidflist = NULL;
+
+    int counter = 0;
+    while(counter<num_of_search_words){
+        InvertedIndexBST word = BSTreeFind(tree, searchWords[counter]);
+        if(word != NULL){
+            FileList itterativecounter = word->fileList;
+            double filecount = 0;
+            while(itterativecounter!=NULL){
+                filecount++;
+                itterativecounter = itterativecounter->next;
+            }
+
+            FileList increment = word->fileList;
+            while(increment != NULL){
+                if(checktfIdfNode(retrievetfidflist, increment->filename) == NULL){
+                    retrievetfidflist = addsingleTfIdfNode(retrievetfidflist, increment->filename, increment->tf, D, filecount);
+                }
+                else{
+                    TfIdfList temp = checktfIdfNode(retrievetfidflist, increment->filename);
+                    double addition = calcsingleTfIdfsum(increment->tf, D, filecount);
+                    temp->tfidf_sum += addition;
+                }
+                increment = increment->next;
+            }
+      }
+        counter++;
+    }
+
+
+    TfIdfList sorted = NULL;
+    sorted= sorttdidf(retrievetfidflist, sorted);
+    return sorted;
+}
+
 
 void printInvertedIndex(InvertedIndexBST tree) {
     if(tree == NULL) return;
@@ -171,15 +247,6 @@ int storeTokenToArray(char *content, char *destination[]){
     }
     return i;
 }
-
-/*TREE FUNCTIONS*/
-
-
-
-
-
-
-
 
 
 
@@ -273,4 +340,93 @@ void showBSTreeNodeandList(InvertedIndexBST t, FILE *output)
     itterative = itterative->next;
   }
   fprintf(output, "\n");
+}
+
+//Calculates the tfidf of a specific tfidf node
+double calcsingleTfIdfsum(double tf, int D, double numoffiles){
+  double tfidfsum = 0;
+  tfidfsum = tf*log10(D/numoffiles);
+  return tfidfsum;
+}
+//Sorts out a tfidf list in order of descending tfidf sum
+//However if tfidf is equal then sort in ascending alphabetically
+TfIdfList sorttdidf(TfIdfList original, TfIdfList addonto){
+
+    TfIdfList originalpointer = original;
+    TfIdfList itterativepointer = addonto;
+    while(originalpointer != NULL){
+        TfIdfList newtfidfnode = duplicatetdidfnode(originalpointer);
+        if(itterativepointer == NULL){
+            addonto = newtfidfnode;
+        }
+        else{
+            if(newtfidfnode->tfidf_sum>itterativepointer->tfidf_sum) {
+                newtfidfnode->next = itterativepointer;
+                addonto = newtfidfnode;
+            }
+            else if(newtfidfnode->tfidf_sum==itterativepointer->tfidf_sum){
+                if(strcmp(newtfidfnode->filename, itterativepointer->filename) > 0){
+                    itterativepointer->next = newtfidfnode;
+                }
+                else{
+                  newtfidfnode->next = itterativepointer;
+                  addonto = newtfidfnode;
+                }
+            }
+            else{
+                while(newtfidfnode->tfidf_sum <= itterativepointer->tfidf_sum){
+                  if(itterativepointer->next == NULL){
+                    itterativepointer->next = newtfidfnode;
+                    break;
+                  }
+                  else if(newtfidfnode->tfidf_sum>itterativepointer->next->tfidf_sum){
+                    newtfidfnode->next = itterativepointer->next;
+                    itterativepointer->next = newtfidfnode;
+                    break;
+                  }
+                  else if(newtfidfnode->tfidf_sum==itterativepointer->next->tfidf_sum){
+                    if(strcmp(newtfidfnode->filename, itterativepointer->next->filename) > 0){
+                      itterativepointer = itterativepointer->next;
+                    }
+                    else{
+                      newtfidfnode->next = itterativepointer->next;
+                      itterativepointer->next = newtfidfnode;
+                      break;
+                    }
+                  }
+                  else{
+                    itterativepointer = itterativepointer->next;
+                  }
+                }
+            }
+        }
+        itterativepointer = addonto;
+        originalpointer = originalpointer->next;
+    }
+    return addonto;
+}
+
+//Duplicates a tfidf node to allow it to be sorted
+TfIdfList duplicatetdidfnode(TfIdfList original){
+  TfIdfList replicate = malloc(sizeof(struct TfIdfNode));
+  assert(replicate != NULL);
+  replicate->filename = malloc(strlen(original->filename)*sizeof(char));
+  strcpy(replicate->filename, original->filename);
+  replicate->tfidf_sum = original->tfidf_sum;
+  replicate->next = NULL;
+  return replicate;
+
+}
+
+//Checks if a tdidf node with the same filename already exist within
+//the tdidf list that is to be returned
+//returns the node if exist or else returns NULL
+TfIdfList checktfIdfNode(TfIdfList t, char * filecheck){
+    while(t != NULL){
+        if(strcmp(t->filename, filecheck) == 0){
+            return t;
+        }
+        t = t->next;
+    }
+    return NULL;
 }

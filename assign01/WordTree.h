@@ -1,10 +1,10 @@
 //writen by Jirayu Sirivorawong, June 2019
-#ifndef WORDTREE
-#define WORDTREE
+#ifndef WORDTREE_H
+#define WORDTREE_H
 
 #include "invertedIndex.h"
 
-WordInsert(InvertedIndexBST, char*);
+InvertedIndexBST WordInsert(InvertedIndexBST t, char* word);
 InvertedIndexBST newNode (char*);
 void BSTreeInfix(InvertedIndexBST t);
 void showBSTreeNode(InvertedIndexBST t);
