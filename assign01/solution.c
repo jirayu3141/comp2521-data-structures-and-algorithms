@@ -333,7 +333,8 @@ int numofdocuments(char *collectionFilename){
     order of tf-idf values. If you have multple files with same tf-idf value, order
     such files (documents) on their filenames using ascending order.
 */
-TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D){
+TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D) 
+{
   InvertedIndexBST wordNode = BSTreeFind(tree, searchWord);
   if(wordNode == NULL){
     return NULL;
@@ -460,7 +461,8 @@ TfIdfList checktfIdfNode(TfIdfList t, char * filecheck){
     of tf-idf values (tfidf_sum). If you have multple files with same tfidf_sum value, order
     such files (documents) on their filenames using ascending order.
 */
-TfIdfList retrieve(InvertedIndexBST tree, char* searchWords[] , int D){
+TfIdfList retrieve(InvertedIndexBST tree, char* searchWords[] , int D) 
+{
     int num_of_search_words = 0;
     while(searchWords[num_of_search_words] != NULL){
         num_of_search_words++;
@@ -569,4 +571,37 @@ TfIdfList duplicatetdidfnode(TfIdfList original){
   replicate->next = NULL;
   return replicate;
 
+}
+/** The function returns an ordered list where each node contains filename and the
+    corresponding tf-idf value for a given searchWord. You only need to return
+    documents (files) that contain a given searchWord. The list must be in descending
+    order of tf-idf values. If you have multple files with same tf-idf value, order
+    such files (documents) on their filenames using ascending order.
+*/
+TfIdfList calculateTfIdf(InvertedIndexBST tree, char *searchWord , int D){
+  InvertedIndexBST wordNode = BSTreeFind(tree, searchWord);
+  if(wordNode == NULL){
+    return NULL;
+  }
+  FileList itterativecounter = wordNode->fileList;
+  double filecounter = 0;
+  while(itterativecounter!=NULL){
+      filecounter++;
+      itterativecounter = itterativecounter->next;
+  }
+
+  if(wordNode == NULL){
+    return NULL;
+  }
+  else{
+    TfIdfList returnvalue = NULL;
+    FileList increment = wordNode->fileList;
+    while(increment != NULL){
+      returnvalue = addsingleTfIdfNode(returnvalue, increment->filename, increment->tf, D, filecounter);
+      increment = increment->next;
+    }
+    TfIdfList sorted = NULL;
+    sorted= sorttdidf(returnvalue, sorted);
+    return sorted;
+  }
 }

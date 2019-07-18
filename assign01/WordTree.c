@@ -9,35 +9,13 @@
 
 #include "WordTree.h"
 
-InvertedIndexBST WordInsert(InvertedIndexBST t, char* word) {
-    if (t == NULL)
-        return newNode (word);   //crete new tree with word in it
-    else if (strcmp(word, t->word) < 0) {
-        t->left = WordInsert(t->left, word);
-    } else if (strcmp (word, t->word) > 0) {
-        t->right = WordInsert(t->right, word);
-    } else;
-    return t;
-}
-
-InvertedIndexBST newNode (char* word) {
-    InvertedIndexBST new = malloc(sizeof *new);
-    if (new == NULL) err (EX_OSERR, "couldn't allocate BST node");
-    new->fileList = NULL;
-    new->left = new->right = NULL;
-    //allocate space for word
-    new->word = malloc(strlen(word) *sizeof(char) + 1);
-    assert(new->word != NULL);
-    strcpy(new->word, word);
-    return new;
-}
-
-void BSTreeInfix(InvertedIndexBST t) {
-    if (t == NULL) return;
-
-    BSTreeInfix(t->left);
-    showBSTreeNode(t);
-    BSTreeInfix(t->right);
+void BSTreeInfix(InvertedIndexBST tree) {
+  if(tree == NULL){
+    return;
+  }
+  BSTreeInfix(tree->left);
+  showBSTreeNode(tree);
+  BSTreeInfix(tree->right);
 }
 
 void showBSTreeNode(InvertedIndexBST t) {
@@ -47,26 +25,27 @@ void showBSTreeNode(InvertedIndexBST t) {
 
 InvertedIndexBST newBSTree(void) { return NULL; }
 
-int fileNodeExist(InvertedIndexBST t, char *word) {
-    FileList itterative = t->fileList;
-    int returnvalue = 0;
-    while (itterative != NULL) {
-        if (strcmp(itterative->filename, word) == 0) {
-            returnvalue = 1;
-        }
-        itterative = itterative->next;
-    }
-    return returnvalue;
+// insert a new value into a BSTree
+InvertedIndexBST BSTreeInsert(InvertedIndexBST t, char *word) {
+    if (t == NULL)
+        return newBSTNode(word);
+    else if (strcmp(t->word , word) < 0)
+        t->left = BSTreeInsert(t->left, word);
+    else if (strcmp(t->word , word) > 0)
+        t->right = BSTreeInsert(t->right, word);
+    else  // (v == t->value)
+        /* don't insert duplicates */;
+    return t;
 }
 
-InvertedIndexBST BSTreeFind(InvertedIndexBST t, char *inputword)
-{
-	if (t == NULL)
-		return NULL;
-	else if (strcmp(inputword, t->word) < 0)
-		return BSTreeFind(t->left, inputword);
-	else if (strcmp(inputword, t->word) > 0)
-		return BSTreeFind(t->right, inputword);
-	else // (v == t->value)
-		return t;
+// make a new node containing a value
+InvertedIndexBST newBSTNode(char *word) {
+    InvertedIndexBST new = malloc(sizeof *new);
+    if (new == NULL) err(EX_OSERR, "couldn't allocate BST node");
+    new->word = malloc(strlen(word) + 1);
+    if (new->word == NULL) err(EX_OSERR, "couldn't allocate word in BST node");
+    strcpy(new->word, word);
+    new->left = new->right = NULL;
+    return new;
 }
+

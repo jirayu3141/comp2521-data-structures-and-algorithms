@@ -2,13 +2,22 @@
 #ifndef WORDTREE_H
 #define WORDTREE_H
 
+#include <stdio.h>
 #include "invertedIndex.h"
 
-InvertedIndexBST WordInsert(InvertedIndexBST t, char* word);
-InvertedIndexBST newNode (char*);
-void BSTreeInfix(InvertedIndexBST t);
+// print values in infix order (refereced from lab03)
+void BSTreeInfix(InvertedIndexBST tree);
+
 void showBSTreeNode(InvertedIndexBST t);
+
+// create a new empty BSTree(refereced from lab03)
 InvertedIndexBST newBSTree(void);
-InvertedIndexBST BSTreeFind(InvertedIndexBST t, char *inputword);
+
+InvertedIndexBST BSTreeInsert(InvertedIndexBST t, char *word);
+
+// make a new node containing a value (lab03)
+InvertedIndexBST newBSTNode(char *word);
+
+
 
 #endif

@@ -1,6 +1,2 @@
-
-
-CC		= gcc
-CFLAGS	= -Wall  -std=gnu11 -g -o 
-.PHONY: all
-invertedIndex: invertedIndex.c WordTree.c 
+invertedIndex: main.c invertedIndex.c WordTree.c
+	gcc -Wall -std=gnu11 -g -o invertedIndex main.c invertedIndex.c WordTree.c
