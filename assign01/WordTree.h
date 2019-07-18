@@ -13,11 +13,20 @@ void showBSTreeNode(InvertedIndexBST t);
 // create a new empty BSTree(refereced from lab03)
 InvertedIndexBST newBSTree(void);
 
-InvertedIndexBST BSTreeInsert(InvertedIndexBST t, char *word);
+//insert word into the tree.
+InvertedIndexBST BSTreeInsert(InvertedIndexBST t, char *word, char *filename);
 
 // make a new node containing a value (lab03)
-InvertedIndexBST newBSTNode(char *word);
+InvertedIndexBST newBSTNode(char *word, char *filename);
+
+//update TF of the word and add file to list if have not been added
+InvertedIndexBST BSTreeInsertDuplicate(InvertedIndexBST t, char *word);
+
+//add the file to filelist
+FileList addFileToList (FileList l, char *filename);
 
 
 
-#endif
+FileList createNewNode(char *filename);
+
+#endif 

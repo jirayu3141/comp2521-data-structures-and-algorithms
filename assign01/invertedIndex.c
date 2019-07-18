@@ -51,8 +51,10 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
     char *file_names[FILENAME_MAX];
     //numFile is the total number of files in collectionFilename
     int numFile = storeTokenToArray(collection_content, file_names);
-   
-    for (int i = 0; i < numFile; i++) {
+    
+    //looping through each file
+    //for (int i = 0; i < numFile; i++) {
+    for (int i = 0; i < 1; i++) {
         //store the text into a temp array
         char *all_words_in_file = ReadFile(file_names[i]);
         //array to store each word
@@ -60,9 +62,11 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
         int numWords = storeTokenToArray(all_words_in_file, buffer);
         //put all the words into tree
         for (int j = 0; j < numWords; j++) {
-            BSTreeInsert(wordTree, buffer[j]);
+            wordTree = BSTreeInsert(wordTree, buffer[j], file_names[i]);
+            //update file list
+            //update tf
 
-            printf("%s\n", buffer[j]);
+            //printf("%s\n", buffer[j]);
         }
     }
 
@@ -92,40 +96,39 @@ void removeSpaces(char *str) {
 }
 char* ReadFile(char *filename)
 {
-   char *buffer = NULL;
-   int string_size, read_size;
-   FILE *handler = fopen(filename, "r");
+    char *buffer = NULL;
+    int string_size, read_size;
+    FILE *handler = fopen(filename, "r");
+    if(handler == NULL) {
+        printf("Error!");          
+    }
+    // Seek the last byte of the file
+    fseek(handler, 0, SEEK_END);
+    // Offset from the first to the last byte, or in other words, filesize
+    string_size = ftell(handler);
+    // go back to the start of the file
+    rewind(handler);
 
-   if (handler)
-   {
-       // Seek the last byte of the file
-       fseek(handler, 0, SEEK_END);
-       // Offset from the first to the last byte, or in other words, filesize
-       string_size = ftell(handler);
-       // go back to the start of the file
-       rewind(handler);
+    // Allocate a string that can hold it all
+    buffer = (char*) malloc(sizeof(char) * (string_size + 1) );
 
-       // Allocate a string that can hold it all
-       buffer = (char*) malloc(sizeof(char) * (string_size + 1) );
+    // Read it all in one operation
+    read_size = fread(buffer, sizeof(char), string_size, handler);
 
-       // Read it all in one operation
-       read_size = fread(buffer, sizeof(char), string_size, handler);
+    // fread doesn't set it so put a \0 in the last position
+    // and buffer is now officially a string
+    buffer[string_size] = '\0';
 
-       // fread doesn't set it so put a \0 in the last position
-       // and buffer is now officially a string
-       buffer[string_size] = '\0';
-
-       if (string_size != read_size)
-       {
-           // Something went wrong, throw away the memory and set
-           // the buffer to NULL
-           free(buffer);
-           buffer = NULL;
-       }
+    if (string_size != read_size)
+    {
+        // Something went wrong, throw away the memory and set
+        // the buffer to NULL
+        free(buffer);
+        buffer = NULL;
+    }
 
        // Always remember to close the file.
        fclose(handler);
-    }
 
     return buffer;
 }
