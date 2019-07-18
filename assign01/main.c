@@ -1,4 +1,5 @@
 #include "invertedIndex.h"
+#include "WordTree.h"
 #include <assert.h>
 #include <err.h>
 #include <stdio.h>
@@ -36,11 +37,26 @@ void testNormalise(){
 
 int main() {
         //testNormalise(); 
-
-		//generateInvertedIndex("collection.txt");
-		FileList myList;
+		generateInvertedIndex("collection.txt");
+		//FileList myList;
 		//printInvertedIndex(invertedTree); 
+		
+		
+		// char filename[] = "animal";
+		// char filename2[] = "file2.txt";
 
+		// char cat[] = "cat";
+		// char dog[] = "dog";
+		// char rat[] = "rat";
+
+		// char * array[3] = {cat, cat, rat};
+		// char * array2[3] = {rat, cat, dog};
+
+		// InvertedIndexBST tree = newBSTree();
+		// for (int i = 0; i<3; i++) {
+		// tree = BSTreeInsert(tree, array[i], filename, 3);
+		// tree = BSTreeInsert(tree, array2[i], filename2, 2);
+		// }
     return 0;
 }   
 

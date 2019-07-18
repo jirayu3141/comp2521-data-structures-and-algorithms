@@ -45,13 +45,11 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
 {
     //create a new tree to store all words
     InvertedIndexBST wordTree = newBSTree();
-    
     //collection_content has the file contents
     char *collection_content = ReadFile(collectionFilename);
     char *file_names[FILENAME_MAX];
     //numFile is the total number of files in collectionFilename
     int numFile = storeTokenToArray(collection_content, file_names);
-    
     //looping through each file
     //for (int i = 0; i < numFile; i++) {
     for (int i = 0; i < 1; i++) {
@@ -61,7 +59,8 @@ InvertedIndexBST generateInvertedIndex(char *collectionFilename)
         char* buffer[BUF_SIZE];
         int numWords = storeTokenToArray(all_words_in_file, buffer);
         //put all the words into tree
-        for (int j = 0; j < numWords; j++) {
+        
+        for (int j = 0; j < numWords - 1; j++) {
             wordTree = BSTreeInsert(wordTree, buffer[j], file_names[i]);
             //update file list
             //update tf
