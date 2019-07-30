@@ -258,6 +258,7 @@ void DLListBefore (DLList L, char *it)
 
 /** insert an item after current item
  * new item becomes current item */
+//empty list??
 void DLListAfter (DLList L, char *it)
 {
 	assert (L != NULL);
@@ -285,16 +286,19 @@ void DLListAfter (DLList L, char *it)
  * new item becomes item following current
  * if current was last, current becomes new last
  * if current was only item, current becomes null */
+///note:: need to change the case for no nodes///
 void DLListDelete (DLList L)
 {
 	assert (L != NULL);
 	DLListNode *new = L->curr;
-
+	//empty list
+	if (L->first == NULL) {
+		return;
+	} else if (L->first == L->last) {
 	//if only one element is left
-	if (L->first == L->last) {
 		L->nitems--;
 		L->first = NULL;
-		free(L);
+		//free(L);
 	//if delete the first node
 	} else if (L->curr == L->first) {
 	    L->curr->next->prev = NULL;
