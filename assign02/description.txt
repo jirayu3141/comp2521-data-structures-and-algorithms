@@ -1,0 +1,5 @@
+ReadData.h
+
+
+getCollection() -> read text file and put it it into an array
+
