@@ -14,10 +14,12 @@
 #include "set.h"
 #include "stack.h"
 #include "url_file.h"
-
+#include "queue.h"
 #define BUFSIZE 1024
 
 static void setFirstURL (char *, char *);
+URL_FILE* openLink (char* url, char* nextUrlBuff);
+
 
 int main (int argc, char **argv)
 {
@@ -60,23 +62,51 @@ int main (int argc, char **argv)
 	//    close the opened URL
 	//    sleep(1)
 	// }
-	if (!(handle = url_fopen (firstURL, "r"))) {
-		fprintf (stderr, "Couldn't open %s\n", next);
-		exit (1);
-	}
-	while (!url_feof (handle)) {
-		url_fgets (buffer, sizeof (buffer), handle);
-		// fputs(buffer,stdout);
-		int pos = 0;
-		char result[BUFSIZE];
-		memset (result, 0, BUFSIZE);
-		while ((pos = GetNextURL (buffer, firstURL, result, pos)) > 0) {
-			printf ("Found: '%s'\n", result);
+
+	// add firstURL to the ToDo list
+	Queue ToDo = newQueue();
+	enterQueue(ToDo, firstURL);
+	//initialise Graph to hold up to maxURLs
+	Graph myGraph = newGraph((size_t)maxURLs);
+	//initialise set of seen URL
+	Set seenURL = newSet();
+	insertInto(seenURL, firstURL);
+	// showQueue(ToDo);
+	// showSet(seenURL);
+
+	handle = openLink(firstURL, next);
+
+	while (!emptyQueue(ToDo) && nVertices(myGraph) <= (size_t)maxURLs) { 
+		strcpy(firstURL, leaveQueue(ToDo));
+		handle = openLink(firstURL, next);
+		
+		
+		while (!url_feof (handle)) {	//while in page
+			url_fgets (buffer, sizeof (buffer), handle); //reading lines in html
+			// fputs(buffer,stdout);
+			int pos = 0;
+			char result[BUFSIZE];
 			memset (result, 0, BUFSIZE);
+			//found html tag
+			while ((pos = GetNextURL (buffer, firstURL, result, pos)) > 0) {
+				printf ("Found: '%s'\n", result);
+				if (nVertices(myGraph) <= (size_t)maxURLs) {
+					addEdge(myGraph, firstURL, result);
+				}
+				if (isElem(seenURL, firstURL) == false) {
+					insertInto(seenURL, result);
+				}
+				memset (result, 0, BUFSIZE);
+			}
 		}
+		url_fclose (handle);
+        free(firstURL);
+        sleep (1);
 	}
-	url_fclose (handle);
-	sleep (1);
+	showGraph(myGraph,1);
+    dropQueue(ToDo);
+    dropSet(seenURL);
+    dropGraph(myGraph);
 	return 0;
 }
 
@@ -97,4 +127,14 @@ static void setFirstURL (char *base, char *first)
 		strcpy (first, base);
 		strcat (first, "/index.html");
 	}
+}
+
+
+URL_FILE* openLink (char* url, char* nextUrlBuff) {
+	URL_FILE *handle;
+	if (!(handle = url_fopen (url, "r"))) {
+		fprintf (stderr, "Couldn't open %s\n", nextUrlBuff);
+		exit (1);
+	}
+	return handle;
 }
