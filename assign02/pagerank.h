@@ -11,5 +11,4 @@ double calculateWout (Graph g, char *vertex, char *vertex2);
 int numOutDegree(Graph g, char *vertex);
 int numInDegree(Graph g, char *vertex);
 
-
 #endif
