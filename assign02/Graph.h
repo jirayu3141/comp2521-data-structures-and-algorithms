@@ -22,4 +22,5 @@ bool isConnected (Graph, char *, char *);
 void showGraph (Graph, int);
 void addPageRank (Graph g, char *vertex, double PR);
 ssize_t vertexID (char *str, char **names, size_t N);
+double getPR (Graph g, char *vertex);
 #endif

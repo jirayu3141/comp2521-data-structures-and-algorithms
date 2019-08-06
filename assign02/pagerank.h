@@ -10,7 +10,6 @@ double calculateWin (Graph g, char *vertex, char *vertex2);
 double calculateWout (Graph g, char *vertex, char *vertex2);
 int numOutDegree(Graph g, char *vertex);
 int numInDegree(Graph g, char *vertex);
-void printWout(Graph g, char **List_of_Urls);
 
 
 #endif

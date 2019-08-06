@@ -201,3 +201,7 @@ static size_t addVertex (char *str, char **names, size_t N)
 	return N;
 }
 
+double getPR (Graph g, char *vertex) {
+	int id = vertexID(vertex, List_of_Urls, numUrl);
+	return g->PageRank[id];
+}

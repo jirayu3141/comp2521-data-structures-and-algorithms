@@ -23,6 +23,9 @@ void printWin(Graph g, int i) {
         printf("Win of [%d][%d] is: %f\n", i, j, Win);
     }
 }
+void printPR(Graph g, int i) {
+    printf("PageRank of [%s] is : %.7f\n", List_of_Urls[i], getPR(g, List_of_Urls[i]));
+}
 
 void loop(Graph g, int value, void (*func)(Graph, int)) {
     for (int i = 0; i < numUrl; i++) {
@@ -34,10 +37,7 @@ int main() {
     char **List_of_Urls = GetCollection();
     Graph g = GetGraph(List_of_Urls);
     showGraph(g, 1);
-    loop(g, numUrl ,printWin);
-
-    // double Win = calculateWin(g, List_of_Urls[1], List_of_Urls[4]);
-    // printf("W in is : %f\n", Win);
-    //printWout(g, List_of_Urls);
+    calculatePageRank(g, 0.850000, 0.000010, 1000);
+    //loop(g, numUrl, printPR);
 
 }

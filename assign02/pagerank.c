@@ -11,7 +11,16 @@
 #define LINE_LENGTH 100
 #define BUFSIZE 50
 
+double PageRank[MAX_URL];
 
+
+double sum_PR(Graph g, char *vertex) {
+    double sum = 0;
+    for (int i = 0; i < numUrl; i++) {
+        sum += PageRank[i] * calculateWin(g, List_of_Urls[i], vertex) * calculateWout(g, List_of_Urls[i], vertex);
+    }
+    return sum;
+}
 
 char **calculatePageRank(Graph g, double d, double diffPR, int maxIterations) {
     //NOTE: remember to free it later
@@ -26,18 +35,35 @@ char **calculatePageRank(Graph g, double d, double diffPR, int maxIterations) {
             err (EX_OSERR, "couldn't allocate List_Url_Pageranks[%d]", i);
         }
         addPageRank(g, List_of_Urls[i], PR);
-        
+    }
+
+    //current Page Rank
+    for (int i = 0; i < numUrl; i++) {
+        PageRank[i] = PR;
     }
 
     int iteration = 0;
     double diff = diffPR;
 
     while(iteration < maxIterations && diff >= diffPR) {
-        //double Win = calculateWin(g, "url11");
-        //double Wout = calculateWout(g, "url11");
-        
-        
+        for (int i = 0; i < numUrl; i++) {
+            PR = (1-d)/(double)numUrl + (d *sum_PR(g, List_of_Urls[i]));
+            addPageRank(g, List_of_Urls[i], PR);
+            PR = 0;
+        }
+        //update PageRank for prev iteration
+        for (int i = 0; i < numUrl; i++) {
+            PageRank[i] = getPR(g, List_of_Urls[i]);
+        }
+
         iteration++;
+    }
+
+    //put data to List_Url_PageRanks
+    for (int i = 0; i < numUrl; i++) {
+        char line[BUFSIZE];
+        sprintf(line, "%s, %d, %.7f", List_of_Urls[i], i, PageRank[i]);
+        strcpy(List_Url_PageRanks[i], line);
     }
 
     return List_Url_PageRanks;  
@@ -147,14 +173,4 @@ int numInDegree(Graph g, char *vertex) {
     return count;
 }
 
-//print Wout (for debugging)
-void printWout(Graph g, char **List_of_Urls) {
-    double Wout = 0;
-        for (int j = 0; j < numUrl; j++) {
-            for (int i = 0; i < numUrl; i++) {
-                Wout = calculateWout(g, List_of_Urls[j], List_of_Urls[i]);
-                if (Wout != 0) 
-                    p("Wout of [%d][%d] is: %f\n", j, i, Wout);
-            }
-        }
-}
+
