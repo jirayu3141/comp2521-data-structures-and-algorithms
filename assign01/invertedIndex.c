@@ -41,39 +41,39 @@ char * normaliseWord(char *str)
     return str;
 }
 
-InvertedIndexBST generateInvertedIndex(char *collectionFilename) 
-{
-    //create a new tree to store all words
-    InvertedIndexBST wordTree = newBSTree();
-    //collection_content has the file contents
-    char *collection_content = ReadFile(collectionFilename);
-    char *file_names[FILENAME_MAX];
-    //numFile is the total number of files in collectionFilename
-    int numFile = storeTokenToArray(collection_content, file_names);
-    //looping through each file
-    //for (int i = 0; i < numFile; i++) {
-    for (int i = 0; i < 1; i++) {
-        //store the text into a temp array
-        char *all_words_in_file = ReadFile(file_names[i]);
-        //array to store each word
-        char* buffer[BUF_SIZE];
-        int numWords = storeTokenToArray(all_words_in_file, buffer);
-        //put all the words into tree
+// InvertedIndexBST generateInvertedIndex(char *collectionFilename) 
+// {
+//     //create a new tree to store all words
+//     InvertedIndexBST wordTree = newBSTree();
+//     //collection_content has the file contents
+//     char *collection_content = ReadFile(collectionFilename);
+//     char *file_names[FILENAME_MAX];
+//     //numFile is the total number of files in collectionFilename
+//     int numFile = storeTokenToArray(collection_content, file_names);
+//     //looping through each file
+//     //for (int i = 0; i < numFile; i++) {
+//     for (int i = 0; i < 1; i++) {
+//         //store the text into a temp array
+//         char *all_words_in_file = ReadFile(file_names[i]);
+//         //array to store each word
+//         char* buffer[BUF_SIZE];
+//         int numWords = storeTokenToArray(all_words_in_file, buffer);
+//         //put all the words into tree
         
-        for (int j = 0; j < numWords - 1; j++) {
-            wordTree = BSTreeInsert(wordTree, buffer[j], file_names[i]);
-            //update file list
-            //update tf
+//         for (int j = 0; j < numWords - 1; j++) {
+//             wordTree = BSTreeInsert(wordTree, buffer[j], file_names[i]);
+//             //update file list
+//             //update tf
 
-            //printf("%s\n", buffer[j]);
-        }
-    }
+//             //printf("%s\n", buffer[j]);
+//         }
+//     }
 
 
-    BSTreeInfix(wordTree);
+//     BSTreeInfix(wordTree);
 
-    return wordTree;
-}
+//     return wordTree;
+// }
 
 /*OTERH FUNCTIONS*/
 void removeSpaces(char *str) {

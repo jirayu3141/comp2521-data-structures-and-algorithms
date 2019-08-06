@@ -8,7 +8,8 @@
 #include <ctype.h>
 #include "readData.h"
 
-
+int numUrl = 0;
+char **List_of_Urls;
 
 char * normaliseWord(char *str) 
 {
@@ -27,6 +28,7 @@ char * normaliseWord(char *str)
     
     return str;
 }
+//remove spaces form string
 void removeSpaces(char *str) {
     int i;
     int begin = 0;
@@ -45,13 +47,15 @@ void removeSpaces(char *str) {
     str[i - begin] = '\0'; // Null terminate string.
 }
 
+// read data from a file and put it into strings
 char* ReadFile(char *filename)
 {
     char *buffer = NULL;
     int string_size, read_size;
     FILE *handler = fopen(filename, "r");
     if(handler == NULL) {
-        printf("Error!");          
+        printf("Error!, cant open file");
+        exit(1); 
     }
     // Seek the last byte of the file
     fseek(handler, 0, SEEK_END);
@@ -83,6 +87,8 @@ char* ReadFile(char *filename)
 
     return buffer;
 }
+
+// read words seperated by tabs or spaces or newline and put it into destination array
 int storeTokenToArray(char *content, char *destination[]){
     char *array[MAX_FILE];
     //extract file names into array
@@ -91,22 +97,70 @@ int storeTokenToArray(char *content, char *destination[]){
     int i = 0;
     while(word != NULL) {
         word = normaliseWord(word);
-        array[i] = word;
+        array[i] = malloc(sizeof(char) * strlen(word+1));
+        //printf("strlen %s = %ld\n", word, sizeof(word));
+        // array[i] = word;
+        strcpy(array[i], word);
         word = strtok(NULL, " ,   \n");
         i++;
     }
     //copy array
     for (int j = 0; j < i; j++) {
-        destination[j] = array[j];
+        // destination[j] = array[j];
+        // Copy to destination
+        destination[j] = malloc(sizeof(char) * strlen(array[j] +1));
+        strcpy(destination[j], array[j]);
+        free(array[j]);
     }
     return i;
 }
 
-char** getCollection() {
-    char *buffer = ReadFile("collection.txt");
-    char **urlList = malloc(MAX_FILE * MAX_FILE);
-    int numFile = storeTokenToArray(buffer, urlList);
-    for (int i = 0; i < numFile; i++)
-        printf("%s\t", urlList[i]);
-    return urlList;
-} 
+// read from collection.txt and return an array of strings that contain the file names
+char** GetCollection() {
+    List_of_Urls = malloc(MAX_FILE * MAX_FILE);
+    numUrl = storeTokenToArray(ReadFile("collection.txt"), List_of_Urls);
+    return List_of_Urls;
+}
+
+//this function reads the url from collection and build a graph out of it
+Graph GetGraph(char **List_of_Urls) {
+    //create new graph
+    Graph g = newGraph(numUrl);
+    //buildGraphFromFile(g, List_of_Urls[1]);
+    //iterate through each file and see what is is linked with each other using breath first search
+    for (int i = 0; i < numUrl; i++) {
+        //printf("%s\n", List_of_Urls[i]);
+        // for each url, read the links and build graph
+
+        buildGraphFromFile(g, List_of_Urls[i]);
+    }
+    return g;
+}
+
+//read section 1 and put the url into a graph
+void buildGraphFromFile(Graph g, char* filename) {
+    //read from .. to ...
+    //char buffer[MAX_FILE];
+    //char *buff = malloc (MAX_FILE * MAX_FILE); 
+    // char* url[MAX_FILE];
+    char** url = (char **) malloc(sizeof(char *) * MAX_URL);
+
+    char *filename_txt = malloc (sizeof(char) * MAX_URL);
+    strcpy(filename_txt, filename);
+
+    strcat(filename_txt, ".txt");
+    char *buff = ReadFile(filename_txt);
+    free(filename_txt);
+    //put the pointer after "start section 1"
+    buff+= 16;
+    //find the end of section 1 and put null character
+    char *curr = strstr(buff ,"#end Section-1");
+    *curr = '\0';
+
+    int urlCount = storeTokenToArray (buff, url);
+    for (int i = 0; i < urlCount; i++) {
+        //put up the vertices)
+        addEdge(g, filename, url[i]);
+    }
+}
+
