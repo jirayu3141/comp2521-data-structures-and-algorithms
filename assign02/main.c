@@ -1,7 +1,7 @@
 #include "readData.h"
 #include "pagerank.h"
 #include <assert.h>
-#include <err.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,11 +33,12 @@ void loop(Graph g, int value, void (*func)(Graph, int)) {
     }
 }
 
-int main() {
-    char **List_of_Urls = GetCollection();
-    Graph g = GetGraph(List_of_Urls);
-    showGraph(g, 1);
-    calculatePageRank(g, 0.850000, 0.000010, 1000);
-    //loop(g, numUrl, printPR);
+// int main() {
+//     char **List_of_Urls = GetCollection();
+//     Graph g = GetGraph(List_of_Urls);
+//     char **List = calculatePageRank(g, 0.850000, 0.000010, 1000);
+//     char **OrderedList = order(List);
+//     outToFile(OrderedList, "pagerankListME2.txt");
+//     //loop(g, numUrl, printPR);
 
-}
+// }

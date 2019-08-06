@@ -1,4 +1,5 @@
-
+//Calculate PageRank from a List of Page
+//Written by Jirayu Sirivorawong  July 2019
 #include <assert.h>
 #include <err.h>
 #include <stdbool.h>
@@ -13,15 +14,23 @@
 
 double PageRank[MAX_URL];
 
+int main(int argc, char *argv[])
+{
+	if (argc < 4) {
+		fprintf(stderr, "Usage: %s  <damping factor> <difference in PageRank sum> <maximum iterations>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
 
-double sum_PR(Graph g, char *vertex) {
-    double sum = 0;
-    for (int i = 0; i < numUrl; i++) {
-        sum += PageRank[i] * calculateWin(g, List_of_Urls[i], vertex) * calculateWout(g, List_of_Urls[i], vertex);
-    }
-    return sum;
+    char **List_of_Urls = GetCollection();
+    Graph g = GetGraph(List_of_Urls);
+    char **List = calculatePageRank(g, atof(argv[1]),  atof(argv[2]),  atof(argv[3]));
+    char **OrderedList = order(List);
+    outToFile(OrderedList, "pagerankList.txt");
+
+    return EXIT_SUCCESS;
 }
 
+//Calculate Page Rank base on the given configuration
 char **calculatePageRank(Graph g, double d, double diffPR, int maxIterations) {
     //NOTE: remember to free it later
     char **List_Url_PageRanks = (char **)malloc(sizeof(char*) * MAX_FILE);
@@ -62,14 +71,14 @@ char **calculatePageRank(Graph g, double d, double diffPR, int maxIterations) {
     //put data to List_Url_PageRanks
     for (int i = 0; i < numUrl; i++) {
         char line[BUFSIZE];
-        sprintf(line, "%s, %d, %.7f", List_of_Urls[i], i, PageRank[i]);
+        sprintf(line, "%s, %d, %.7f", List_of_Urls[i], numOutDegree(g, List_of_Urls[i]), PageRank[i]);
         strcpy(List_Url_PageRanks[i], line);
     }
-
     return List_Url_PageRanks;  
     
 }
 
+//calcualte W in of given vertices
 double calculateWin (Graph g, char *vertex, char *vertex2) {
     double Win = 0;
     //check if the node is connected in the first place
@@ -107,6 +116,7 @@ double calculateWin (Graph g, char *vertex, char *vertex2) {
     return Win;
 }
 
+//calculate W out of 2 given vertices
 double calculateWout (Graph g, char *vertex, char *vertex2) {
     double Wout = 0;
     //check if the node is connected in the first place
@@ -173,4 +183,64 @@ int numInDegree(Graph g, char *vertex) {
     return count;
 }
 
+//calculate the sum of pagerank (2nd part of PR equation)
+double sum_PR(Graph g, char *vertex) {
+    double sum = 0;
+    for (int i = 0; i < numUrl; i++) {
+        sum += PageRank[i] * calculateWin(g, List_of_Urls[i], vertex) * calculateWout(g, List_of_Urls[i], vertex);
+    }
+    return sum;
+}
 
+char **order(char **List) {
+    char **Ordered_List_Urls_PageRank = (char **)malloc(sizeof(char*) * MAX_FILE);
+
+    //allocate array space
+    for (int i = 0; i < numUrl; i++) {
+        //allocate space for the strings in array List_Url_PageRank
+        Ordered_List_Urls_PageRank[i] = malloc (sizeof(char) * LINE_LENGTH);
+        if (Ordered_List_Urls_PageRank[i] == NULL) {
+            err (EX_OSERR, "couldn't allocate List_Url_Pageranks[%d]", i);
+        }
+    }
+
+    double *temp_PR = malloc(sizeof(double) * numUrl);
+    assert(temp_PR != NULL);
+    //copy temp array for sorting
+    for (int i = 0; i < numUrl; i++) {
+        temp_PR[i] = PageRank[i];
+    }
+
+    double max = 0;
+    int maxInd = 0;
+    for (int j = 0; j < numUrl; j++) {
+        for (int i = 0; i < numUrl; i++) {
+            if (max < temp_PR[i]){ 
+                max = temp_PR[i];
+                maxInd = i;
+            }
+        }
+        strcpy(Ordered_List_Urls_PageRank[j], List[maxInd]);
+        temp_PR[maxInd] = 0;
+        maxInd = 0;
+        max = 0;
+    }
+    free (temp_PR);
+
+    return Ordered_List_Urls_PageRank;
+}
+
+//output the list to file
+void outToFile(char** List, char *name) {
+    FILE *fp = fopen(name, "w");
+    if (fp == NULL) {
+      fprintf(stderr, "Cant create %s file", name);
+      exit(1);
+   }
+    int i = 0;
+    while(i < numUrl) {
+        fprintf(fp, "%s\n", List[i]);
+        i++;
+    }
+    fclose(fp);
+}
