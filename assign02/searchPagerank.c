@@ -18,5 +18,7 @@
 
 int main (int argc, char *argv[]) {
     /* Tree invertedTree =*/ generateInvertedIndex("collection.txt");
+
+
 }
 

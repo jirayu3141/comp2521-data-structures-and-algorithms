@@ -29,4 +29,7 @@ void buildGraphFromFile(Graph , char* filename);
 
 //show graph in a format that shows the name
 void showGraph1 (Graph g, char **names);
+
+//read section 2 of the file
+int readSection2 (char *filename, char **destination);
 #endif

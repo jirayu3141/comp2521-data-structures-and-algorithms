@@ -1,6 +1,7 @@
 // Written by Jirayu Sirivorawong, June 2019
 #include "invertedIndex.h"
 #include "WordTree.h"
+#include "readData.h"
 
 #include <assert.h>
 #include <err.h>
@@ -13,7 +14,20 @@
 #include <math.h>
 #include <stdbool.h>
 
+
 Tree generateInvertedIndex(char *collectionFilename) {
-    return NULL;
+    //create a new tree
+    Tree wordTree = newTree(InsertAVL);
+    GetCollection();
+    //debug
+    char *WordsInFile[MAX_FILE] = {'\0'};
+
+    for (int i = 0; i < numUrl; i++) {
+        char WordsInFile[MAX_FILE] = {'\0'};
+        readSection2(List_of_Urls[i], WordsInFile);
+        //putWordIntoTree(wordTree, WordsInFile);
+
+    }
+    return wordTree;
 }
 

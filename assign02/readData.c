@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include "readData.h"
 
+#define MAX_WORD 5000
 int numUrl = 0;
 char **List_of_Urls;
 
@@ -54,7 +55,7 @@ char* ReadFile(char *filename)
     int string_size, read_size;
     FILE *handler = fopen(filename, "r");
     if(handler == NULL) {
-        printf("Error!, cant open file");
+        printf("Error!, can't open file\n");
         exit(1); 
     }
     // Seek the last byte of the file
@@ -165,3 +166,27 @@ void buildGraphFromFile(Graph g, char* filename) {
 }
 
 
+//read section 2 of the file and store it in an array
+int readSection2 (char *filename, char *destination[]) {
+    int i = 0;
+    //initialize arrays
+    char *fileContent = ReadFile(filename);
+    //char word[MAX_WORD] = {'\0'};
+    
+    //find section 2 
+    fileContent = strstr(fileContent, "#start Section-2");
+    char *start= fileContent + strlen("#start Section-2");
+
+    //remove end Section 2
+    char *end;
+    end = strstr(fileContent, "#end Section-2");
+    *end = '\0';
+
+    //tokenise
+    storeTokenToArray(start, destination);    
+
+    for (int i = 0; destination[i] != NULL; i++) {
+        printf("%s\n", destination[i]);
+    }
+    return i;
+}
