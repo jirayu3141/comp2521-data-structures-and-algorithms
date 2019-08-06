@@ -23,7 +23,7 @@ Tree generateInvertedIndex(char *collectionFilename) {
     char *WordsInFile[MAX_FILE] = {'\0'};
 
     for (int i = 0; i < numUrl; i++) {
-        char WordsInFile[MAX_FILE] = {'\0'};
+        char *WordsInFile[MAX_FILE] = {'\0'};
         readSection2(List_of_Urls[i], WordsInFile);
         //putWordIntoTree(wordTree, WordsInFile);
 

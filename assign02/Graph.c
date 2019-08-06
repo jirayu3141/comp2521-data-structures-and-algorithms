@@ -9,7 +9,7 @@
 #include <string.h>
 #include <sysexits.h>
 
-#include "graph.h"
+#include "Graph.h"
 #include "readData.h"
 
 #define strEQ(g, t) (strcmp ((g), (t)) == 0)
