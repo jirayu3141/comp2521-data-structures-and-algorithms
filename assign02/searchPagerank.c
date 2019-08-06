@@ -10,6 +10,8 @@
 #include "pagerank.h"
 #include "invertedIndex.h"
 
+///FUNCTION PROTOTYPE///
+
 int main (int argc, char *argv[]) {
-    generateInvertedIndex("collection.txt");
+    //generateInvertedIndex("collection.txt");
 }
