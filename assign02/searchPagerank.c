@@ -1,4 +1,7 @@
 //Written by Jirayu Sirivorawong  July 2019
+#include "pagerank.h"
+#include "invertedIndex.h"
+
 #include <assert.h>
 #include <err.h>
 #include <stdbool.h>
@@ -7,11 +10,13 @@
 #include <string.h>
 #include <sysexits.h>
 #include <math.h>
-#include "pagerank.h"
-#include "invertedIndex.h"
+
 
 ///FUNCTION PROTOTYPE///
 
+
+
 int main (int argc, char *argv[]) {
-    //generateInvertedIndex("collection.txt");
+    /* Tree invertedTree =*/ generateInvertedIndex("collection.txt");
 }
+

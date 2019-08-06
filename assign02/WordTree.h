@@ -8,7 +8,7 @@ it uses:
  */
 
 
-
+#include <stdio.h>
 #ifndef BSTREE_H
 #define BSTREE_H
 
