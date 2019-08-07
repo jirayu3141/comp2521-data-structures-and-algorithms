@@ -11,12 +11,13 @@
 #include <stdbool.h>
 
 #include "WordTree.h"
-
+#include "readData.h"
 
 
 // Forward references for private functions
 
 static Link newNode (Item);
+static Link newNodeWithUrl (Item v, char* url);
 static void drop (Link);
 static int depth (Link);
 static int size (Link);
@@ -27,6 +28,7 @@ static Link insertRandom (Link, Item);
 static Link insertRebalance (Link, Item);
 static Link insertSplay (Link, Item);
 static Link insertAVL (Link, Item);
+static Link insertAVLwithURL (Link t, Item it, char *filename);
 
 static Link search (Link, Key);
 static Link searchSplay (Link, Key, int *);
@@ -41,6 +43,7 @@ static Link rotateL (Link);
 
 static void doShowTree (Link);
 
+static DLListNode *newDLListNode(char *it);
 // used to hold current tree during insertion
 
 static Tree thisTree = NULL;
@@ -59,7 +62,25 @@ static Link newNode (Item v)
 {
 	Node *new = malloc (sizeof *new);
 	if (new == NULL) err (EX_OSERR, "couldn't allocate Tree node");
-	*new = (Node) { .value = v, .within = thisTree };
+	*new = (Node) { .value = v, .within = thisTree, .url = NULL};
+	
+	return new;
+}
+
+static Link newNodeWithUrl (Item v, char* url)
+{
+	Node *new = malloc (sizeof *new);
+	if (new == NULL) err (EX_OSERR, "couldn't allocate Tree node");
+	*new = (Node) { .value = v, .within = thisTree, .url = NULL};
+
+	if (new->url == NULL) {
+		//create new list
+		new->url = newDLList();
+		new->url->first = new->url->last = newDLListNode(url);
+		new->url->nitems = 0;
+		new->url->nitems = 1;
+
+	}	
 	return new;
 }
 
@@ -152,6 +173,11 @@ void TreeInsert (Tree t, Item it)
 
 	// printf("After inserting %d, tree is:\n",key(it));
 	// showTree(t);
+}
+
+void TreeInsertWithURL (Tree t, Item it, char* url)
+{
+		t->root = insertAVLwithURL (t->root, it, url);
 }
 
 // Helpers: various styles of insert
@@ -254,9 +280,27 @@ static Link insertSplay (Link t, Item it)
 	return t;
 }
 
+// static Link insertAVL (Link t, Item it)
+// {
+// 	if (t == NULL) return newNode (it);
+// 	int diff = cmp (key (it), key (t->value));
+// 	t->within->ncompares++;
+// 	if (diff == 0)     t->value = it;
+// 	else if (diff < 0) t->left  = insertAVL (t->left, it);
+// 	else if (diff > 0) t->right = insertAVL (t->right, it);
+
+// 	int dL = depth (t->left);
+// 	int dR = depth (t->right);
+// 	if ((dL - dR) > 1) t = rotateR (t);
+// 	if ((dR - dL) > 1) t = rotateL (t);
+// 	return t;
+// }
+
 static Link insertAVL (Link t, Item it)
 {
-	if (t == NULL) return newNode (it);
+	if (t == NULL) {
+		return newNode (it);
+	}
 	int diff = cmp (key (it), key (t->value));
 	t->within->ncompares++;
 	if (diff == 0)     t->value = it;
@@ -267,7 +311,77 @@ static Link insertAVL (Link t, Item it)
 	int dR = depth (t->right);
 	if ((dL - dR) > 1) t = rotateR (t);
 	if ((dR - dL) > 1) t = rotateL (t);
+
+
 	return t;
+}
+
+static Link insertAVLwithURL (Link t, Item it, char *filename)
+{
+	if (t == NULL) {
+		return newNodeWithUrl (it, filename);
+	}
+	//t->within->ncompares++;
+	if (strcmp(t->value, it) == 0) {
+		t->value = it;
+		//if url is not already in the list, insert it
+		if ((urlExist(t->url, filename)) == false) {
+			//insertinorder
+			DLListInsertInOrder(t->url, filename);
+		}
+	}
+	else if (strcmp(t->value, it) > 0) t->left  = insertAVLwithURL (t->left, it, filename);
+	else if (strcmp(t->value, it) < 0) t->right = insertAVLwithURL (t->right, it, filename);
+
+	int dL = depth (t->left);
+	int dR = depth (t->right);
+	if ((dL - dR) > 1) t = rotateR (t);
+	if ((dR - dL) > 1) t = rotateL (t);
+
+
+	return t;
+}
+
+bool urlExist(DLList l, char* url) {
+	l->curr = l->first;
+	while (l->curr != NULL) {
+		if (strcmp(l->curr->value, url) == 0)
+			return true;
+		l->curr = l->curr->next;
+	}
+	return false;
+}
+
+/** url into correct place in a sorted IntList. */
+void DLListInsertInOrder (DLList L, char *url)
+{
+	L->curr = L->first;
+	DLListNode *new = newDLListNode(url);
+
+	//if list is empty
+	if (L->first == NULL) {
+		L->first = newDLListNode(url);
+		L->nitems++;
+	// insert at beginning
+	} else if (strcmp(L->first->value, new->value) > 0) {
+		new->next = L->first;
+		new->next->prev = new;
+		L->first = new;
+		L->nitems++;
+	} else {
+		while (L->curr->next != NULL && strcmp(L->curr->next->value, new->value) < 0) {
+			L->curr = L->curr->next;
+		}
+		new->next = L->curr->next;
+
+		if (L->curr->next != NULL)
+			new->next->prev = new;
+
+		L->curr->next = new;
+		new->prev = L->curr;
+		
+		L->nitems++;
+	}
 }
 
 // Interface: check whether a value is in a Tree
@@ -466,7 +580,7 @@ static Link rotateL (Link n2)
 	n2->right = n1->left;
 	//make the previous root the new child
 	n1->left = n2;
-	n2->within->nrotates++;
+	//n2->within->nrotates++;
 	return n1;
 }
 
@@ -478,7 +592,7 @@ static Link rotateR (Link n1)
 	if (n2 == NULL) return n1;
 	n1->left = n2->right;
 	n2->right = n1;
-	n1->within->nrotates++;
+	//n1->within->nrotates++;
 	return n2;
 }
 
@@ -737,7 +851,6 @@ static void compute_rprofile (asciinode *node, int x, int y)
 }
 
 static void freeDLListNode(DLListNode *node);
-static DLListNode *newDLListNode(char *it);
 
 /** Create a new, empty DLList. */
 DLList newDLList (void)
@@ -1041,3 +1154,14 @@ bool DLListIsEmpty (DLList L)
 {
 	return L->nitems == 0;
 }
+
+/* print DLList. Assument File is open for writing */
+void DLListPrint (DLList L, FILE *destination)
+{
+	assert (L != NULL);
+	L->curr = L->first;
+	for (; L->curr != NULL; L->curr = L->curr->next)
+		fprintf (destination, "%s ", L->curr->value);
+	fprintf(destination, "\n");
+}
+

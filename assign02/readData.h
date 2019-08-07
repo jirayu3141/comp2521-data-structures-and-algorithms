@@ -3,12 +3,16 @@
 
 #ifndef READDATA_H
 #define READDATA_H
+
 #define MAX_FILE 1000
 #define MAX_URL 100
 #define p(...) printf(__VA_ARGS__)
 #include "Graph.h"
 extern int numUrl;
 extern char **List_of_Urls; 
+//normalise a word
+char *normaliseWord(char *str);
+
 //remove spaces form string
 void removeSpaces(char *str);
 
@@ -32,4 +36,7 @@ void showGraph1 (Graph g, char **names);
 
 //read section 2 of the file
 int readSection2 (char *filename, char **destination);
+
+
+
 #endif

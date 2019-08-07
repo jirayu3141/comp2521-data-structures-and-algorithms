@@ -11,6 +11,7 @@
 #define MAX_WORD 5000
 int numUrl = 0;
 char **List_of_Urls;
+Graph urlGraph;
 
 char * normaliseWord(char *str) 
 {
@@ -168,9 +169,14 @@ void buildGraphFromFile(Graph g, char* filename) {
 
 //read section 2 of the file and store it in an array
 int readSection2 (char *filename, char *destination[]) {
+    //add .txt extension
+    char filename_txt[MAX_URL];
+    strcpy(filename_txt, filename);
+    strcat(filename_txt, ".txt");
+    //flag if reading fails
     int i = 0;
     //initialize arrays
-    char *fileContent = ReadFile(filename);
+    char *fileContent = ReadFile(filename_txt);
     //char word[MAX_WORD] = {'\0'};
     
     //find section 2 
@@ -181,12 +187,7 @@ int readSection2 (char *filename, char *destination[]) {
     char *end;
     end = strstr(fileContent, "#end Section-2");
     *end = '\0';
-
     //tokenise
-    storeTokenToArray(start, destination);    
-
-    for (int i = 0; destination[i] != NULL; i++) {
-        printf("%s\n", destination[i]);
-    }
+    storeTokenToArray(start, destination);
     return i;
 }

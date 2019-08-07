@@ -14,20 +14,50 @@
 #include <math.h>
 #include <stdbool.h>
 
+#define MAX_WORD 5000
 
 Tree generateInvertedIndex(char *collectionFilename) {
     //create a new tree
     Tree wordTree = newTree(InsertAVL);
-    GetCollection();
-    //debug
-    char *WordsInFile[MAX_FILE] = {'\0'};
-
+    //buildTreeFromFile(wordTree, List_of_Urls[0]);
     for (int i = 0; i < numUrl; i++) {
-        char *WordsInFile[MAX_FILE] = {'\0'};
-        readSection2(List_of_Urls[i], WordsInFile);
-        //putWordIntoTree(wordTree, WordsInFile);
-
+        buildTreeFromFile(wordTree, List_of_Urls[i]);
     }
+    //showTree(wordTree);
     return wordTree;
 }
 
+Tree buildTreeFromFile(Tree wordTree, char *url) {
+    //read data from url (section 2)
+    char *WordsInFile[MAX_WORD] = {'\0'};
+    readSection2(url, WordsInFile);    
+    //scan the word array and insert into a tree
+    for (int i = 0; WordsInFile[i] != NULL; i++) {
+        TreeInsertWithURL(wordTree, WordsInFile[i], url);
+    }
+    //if the word is did not exist, add url LL node
+    return wordTree;
+}
+
+
+void printInvertedIndex(Tree t) {
+    assert(t != NULL);
+    FILE *output = fopen("invertedIndex.txt", "w");
+    assert(output != NULL);
+
+    Link root = t->root;
+    showWordAndUrl (root, output);
+
+    fclose(output);
+}
+
+void showWordAndUrl (Link t, FILE *output) {
+    if (t == NULL) {
+        return;
+    }
+
+    showWordAndUrl(t->left, output);
+    fprintf(output,"%s ", t->value);
+    DLListPrint(t->url, output);
+    showWordAndUrl(t->right, output);
+}
