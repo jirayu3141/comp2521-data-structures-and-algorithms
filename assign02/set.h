@@ -4,7 +4,20 @@
 #ifndef SET_H
 #define SET_H
 
+typedef struct SetNode *SetLink;
 typedef struct SetRep *Set;
+typedef struct SetNode {
+	char *val;
+	int wordScore;
+	double page_rank_score;
+	SetLink next;
+} SetNode;
+
+typedef struct SetRep {
+	int nelems;
+	SetLink elems;
+} SetRep;
+
 
 // Function signatures
 
@@ -15,5 +28,5 @@ void dropFrom (Set, char *);
 int isElem (Set, char *);
 int nElems (Set);
 void showSet (Set);
-void insertUrlInto(char*, Set, char*);
+char **extractSearhUrl(char *filename, char *word);
 #endif
