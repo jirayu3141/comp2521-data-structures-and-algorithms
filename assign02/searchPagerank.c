@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
+#include <ctype.h>
 #include <math.h>
 
 
@@ -26,8 +27,7 @@ int main (int argc, char *argv[]) {
     Set searchResult = newSet();
     
     //find a resulted url and put it into set
-    //insertUrlInto("invertedIndex.txt" ,searchResult, "mars");
-    normaliseWord(" test");
+    insertUrlInto("invertedIndex.txt" ,searchResult, "experiments");
     //insertUrlInto("invertedIndex.txt" ,searchResult, "design");
 
 

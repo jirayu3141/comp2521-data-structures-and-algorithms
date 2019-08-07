@@ -35,7 +35,6 @@ void removeSpaces(char *str) {
     int i;
     int begin = 0;
     int end = strlen(str) - 1;
-
     while (isspace((unsigned char) str[begin]))
         begin++;
 
@@ -47,6 +46,8 @@ void removeSpaces(char *str) {
         str[i - begin] = str[i];
 
     str[i - begin] = '\0'; // Null terminate string.
+
+
 }
 
 // read data from a file and put it into strings

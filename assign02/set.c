@@ -17,6 +17,9 @@
 
 #define MAX_FILESIZE 5000
 
+//fucntion prototype
+char **extractSearhUrl(char *filename, char *word);
+
 typedef struct Node *Link;
 
 typedef struct Node {
@@ -175,19 +178,80 @@ static int findNode (Link list, char *str, Link *cur, Link *pre)
 	return (curr != NULL && strEQ (str, curr->val));
 }
 
-void insertUrlInto(char *filename, Set s, char *word) {
+// returns number of words in str 
+// taken from geeksforgeeks.orgs
+unsigned countWords(char *str) 
+{ 
+    int state = 0; 
+    unsigned wc = 0;  // word count 
+  
+    // Scan all characters one by one 
+    while (*str) 
+    { 
+        // If next character is a separator, set the  
+        // state as OUT 
+        if (*str == ' ' || *str == '\t') 
+            state = 0; 
+		else if (*str == '\n') {
+			break;
+		}
+        // If next character is not a word separator and  
+        // state is OUT, then set the state as IN and  
+        // increment word count 
+        else if (state == 0) 
+        { 
+            state = 1; 
+            ++wc; 
+        } 
+  
+        // Move to next character 
+        ++str; 
+    } 
+  
+    return wc; 
+} 
+char **extractSearhUrl(char *filename, char *word) {
 	//find the url corresponding with
-	normaliseWord(word);
-	char str[BUFSIZ] = {'\0'};
+	char **extractedURL = malloc(sizeof(char*) * MAX_FILE);
+	char wordSearch[BUFSIZ];
+	strcpy(wordSearch, word);
+	normaliseWord(wordSearch);
 	char *buffer = ReadFile(filename);
 	char *foundword = buffer;
 
-	printf("%s", foundword);
-	strstr(foundword, word);
+	foundword = strstr(foundword, wordSearch);
+	//word not found
+	if (foundword == NULL) {
+		return extractedURL;
+	} 
+
+	foundword += strlen(wordSearch) + 1;
+	if (*foundword != 'u' && *(foundword+1) != 'r' && *(foundword+2) != 'l') {
+		return extractedURL;
+	}
+
+	//printf("%s", foundword);
 	//sscanf(foundword, "%*s %s\n", str);
-	assert (s != NULL);
+	for (int i = 0; i < countWords(foundword); i ++) {
+		
+	}
+	char *token;
+	
+	for (int i = 0; (token = strtok_r(foundword, " ", &foundword)) && *token != '\n'; i++) {
+		extractedURL[i] = malloc(sizeof(char) * MAX_FILE);
+		strcpy(extractedURL[i], token);
+	}
 	
 	
+	return extractedURL;
+}
+void insertUrlInto(char *filename, Set s, char *word) {
+	
+	
+	char str[BUFSIZ] = {'\0'};
+	char **urls = extractSearhUrl(filename, word);
+	for (int i = 0; urls[i] != NULL; i++) 
+		printf("%s\n", urls[i]);
 	// Link curr, prev;
 	// int found = findNode (s->elems, str, &curr, &prev);
 	// if (found)

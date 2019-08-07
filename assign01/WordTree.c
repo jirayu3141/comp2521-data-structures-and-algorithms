@@ -71,8 +71,7 @@ InvertedIndexBST BSTreeInsertDuplicate(InvertedIndexBST t, char *word){
   return t;
 }
 
-int addFileToList (FileList l, char *filename, int numWords) {
-    int flag = 0;
+void addFileToList (FileList l, char *filename, int numWords) {
     if (!(isInList(l, filename))) {
         FileList new = createNewNode(filename, numWords);
         new->tf = 0;
@@ -103,9 +102,7 @@ int addFileToList (FileList l, char *filename, int numWords) {
                 curr = curr->next;
             }
         }
-        flag = 1;
     }
-    return flag;
 }
 
 int isInList(FileList l, char *filename) {
@@ -143,16 +140,16 @@ void updateTF(InvertedIndexBST t, char*filename, int numWords) {
     }
     
 }
-InvertedIndexBST WordInsert(InvertedIndexBST t, char* word) {
-    if (t == NULL)
-        return newNode (word);   //crete new tree with word in it
-    else if (strcmp(word, t->word) < 0) {
-        t->left = WordInsert(t->left, word);
-    } else if (strcmp (word, t->word) > 0) {
-        t->right = WordInsert(t->right, word);
-    } else;
-    return t;
-}
+// InvertedIndexBST WordInsert(InvertedIndexBST t, char* word) {
+//     if (t == NULL)
+//         return newNode (t,word);   //crete new tree with word in it
+//     else if (strcmp(word, t->word) < 0) {
+//         t->left = WordInsert(t->left, word);
+//     } else if (strcmp (word, t->word) > 0) {
+//         t->right = WordInsert(t->right, word);
+//     } else;
+//     return t;
+// }
 
 int fileNodeExist(InvertedIndexBST t, char *word) {
     FileList itterative = t->fileList;
@@ -200,13 +197,13 @@ double calculatetf(char *file, char *word){
   return tf;
 }
 
-//Adds a filenode to a word node
-void addFileNode(InvertedIndexBST indexWordNode, FileList fileNode)
-{
-  if(indexWordNode->fileList == NULL){
-    indexWordNode->fileList = fileNode;
-  }
-  else{
-    fileNodeInsert(indexWordNode, fileNode);
-  }
-}
+// //Adds a filenode to a word node
+// void addFileNode(InvertedIndexBST indexWordNode, FileList fileNode)
+// {
+//   if(indexWordNode->fileList == NULL){
+//     indexWordNode->fileList = fileNode;
+//   }
+//   else{
+//     fileNodeInsert(indexWordNode, fileNode);
+//   }
+// }
