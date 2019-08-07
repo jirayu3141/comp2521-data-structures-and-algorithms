@@ -24,7 +24,8 @@ char **extractSearhUrl(char *filename, char *word);
 double findPageRank(char *url);
 void addWordScore(SetLink s, char* word);
 void insertMode (SetLink list, char *str, SetLink *cur, SetLink *pre);
-
+//char* mystrdup(const char* s);	//incase it is not included in string.h
+char *mystrtok_r (char *s, const char *delim, char **save_ptr); //in case it is not included in some version of gcc string.h
 
 
 // Function signatures
@@ -146,7 +147,7 @@ static SetLink newNode (char *str)
 {
 	SetLink new = malloc (sizeof (SetNode));
 	assert (new != NULL);
-	new->val = strdup (str);
+	new->val = mystrdup (str);
 	new->next = NULL;
 	new->wordScore = 1;
 	new->page_rank_score = findPageRank(str);
@@ -256,7 +257,7 @@ char **extractSearhUrl(char *filename, char *word) {
 
 	//copy urls to extractedURL array
 	char *token;
-	for (int i = 0; (token = strtok_r(foundword, " ", &foundword)) && *token != '\n'; i++) {
+	for (int i = 0; (token = mystrtok_r(foundword, " ", &foundword)) && *token != '\n'; i++) {
 		extractedURL[i] = malloc(sizeof(char) * MAX_FILE);
 		strcpy(extractedURL[i], token);
 	}
@@ -292,4 +293,37 @@ void addWordScore (SetLink list, char *str)
 		curr = curr->next;
 	}
 	curr->wordScore++;
+}
+
+
+
+//taken from "https://code.woboq.org/userspace/glibc/string/strtok_r.c.html"
+char *mystrtok_r (char *s, const char *delim, char **save_ptr)
+{
+  char *end;
+  if (s == NULL)
+    s = *save_ptr;
+  if (*s == '\0')
+    {
+      *save_ptr = s;
+      return NULL;
+    }
+  /* Scan leading delimiters.  */
+  s += strspn (s, delim);
+  if (*s == '\0')
+    {
+      *save_ptr = s;
+      return NULL;
+    }
+  /* Find the end of the token.  */
+  end = s + strcspn (s, delim);
+  if (*end == '\0')
+    {
+      *save_ptr = end;
+      return s;
+    }
+  /* Terminate the token and make *SAVE_PTR point past it.  */
+  *end = '\0';
+  *save_ptr = end + 1;
+  return s;
 }

@@ -881,7 +881,7 @@ static DLListNode *newDLListNode (char *it)
 {
 	DLListNode *new = malloc (sizeof *new);
 	if (new == NULL) err (EX_OSERR, "couldn't allocate DLList node");
-	new->value = strdup (it);
+	new->value = mystrdup (it);
 	new->prev = new->next = NULL;
 	return new;
 }
@@ -1164,4 +1164,3 @@ void DLListPrint (DLList L, FILE *destination)
 		fprintf (destination, "%s ", L->curr->value);
 	fprintf(destination, "\n");
 }
-

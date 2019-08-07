@@ -197,11 +197,18 @@ ssize_t vertexID (char *str, char **names, size_t N)
 // - add Str at end of Names
 static size_t addVertex (char *str, char **names, size_t N)
 {
-	names[N] = strdup (str);
+	names[N] = mystrdup (str);
 	return N;
 }
 
 double getPR (Graph g, char *vertex) {
 	int id = vertexID(vertex, List_of_Urls, numUrl);
 	return g->PageRank[id];
+}
+
+char* mystrdup(const char* s)
+{
+    char* p = malloc(strlen(s)+1);
+    if (p) strcpy(p, s);
+    return p;
 }
