@@ -192,3 +192,9 @@ int readSection2 (char *filename, char *destination[]) {
     storeTokenToArray(start, destination);
     return i;
 }
+
+//this function build an array of strings from files (tokenising)
+void buildStringArray(char *filename, char **destination) {
+    char* fileContent = ReadFile(filename);
+    storeTokenToArray(fileContent, destination);
+}

@@ -37,6 +37,8 @@ void showGraph1 (Graph g, char **names);
 //read section 2 of the file
 int readSection2 (char *filename, char **destination);
 
+// read from anyfile and put the word into array of strings
+void buildStringArray(char *filename, char **destination);
 
 
 #endif

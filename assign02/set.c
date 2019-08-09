@@ -3,6 +3,9 @@
 // Modified to be able to save pageRank by Jirayu Sirivorawong
 // functions in the prototype function are newly written
 // functions modified includes insertInto to insert in order of pagerank.
+// function that has 1 infront of the names are for regular set for string
+// fucntion without 1 are for type url struct (part 1 & 2)
+
 #include <assert.h>
 #include <err.h>
 #include <stdio.h>
@@ -61,6 +64,7 @@ void dropSet (Set s)
 	free (s);
 }
 
+//for url insersion
 // insertInto(Set,Str)
 // - ensure that Str is in Set
 void insertInto (Set s, char *str)
@@ -87,6 +91,7 @@ void insertInto (Set s, char *str)
 		prev->next = new;
 	}
 }
+
 
 // dropFrom(Set,Str)
 // - ensure that Str is not in Set
@@ -142,7 +147,7 @@ void showSet (Set s)
 }
 
 // Helper functions
-
+//newNode for url stuct (part 1 & 2)
 static SetLink newNode (char *str)
 {
 	SetLink new = malloc (sizeof (SetNode));
@@ -161,23 +166,7 @@ static void dropNode (SetLink curr)
 	free (curr);
 }
 
-// findNode(L,Str)
-// - finds where Str could be added into L
-// - if already in L, curr->val == Str
-// - if not already in L, curr and prev indicate where to insert
-// - return value indicates whether Str found or not
-// static int findNode (SetLink list, char *str, SetLink *cur, SetLink *pre)
-// {
-// 	SetLink curr = list, prev = NULL;
-// 	while (curr != NULL && strLT (curr->val, str)) {
-// 		prev = curr;
-// 		curr = curr->next;
-// 	}
-// 	*cur = curr;
-// 	*pre = prev;
-// 	return (curr != NULL && strEQ (str, curr->val));
-// }
-
+// special finadNode used for urls
 static int findNode (SetLink list, char *str, SetLink *cur, SetLink *pre)
 {
 	SetLink curr = list, prev = NULL;
