@@ -23,7 +23,7 @@ typedef struct SetRep {
 
 set newSet (void);
 void dropSet (set);
-void insertInto (set, char *);
+void insertInto (set, char *, int);
 void dropFrom (set, char *);
 int isElem (set, char *);
 int nElems (set);

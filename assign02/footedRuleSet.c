@@ -12,14 +12,14 @@
 
 #define strEQ(s, t) (strcmp ((s), (t)) == 0)
 #define strLT(s, t) (strcmp ((s), (t)) < 0)
-
+#define MAX_FILE 50
 
 // Function signatures
 
-static setLink newNode (char *);
+static setLink newNode (char *, int);
 static void dropNode (setLink);
 static int findNode (setLink, char *, setLink *, setLink *);
-
+void InsertIndex(setLink, int);
 // newSet()
 // - create an initially empty set
 set newSet (void)
@@ -49,15 +49,16 @@ void dropSet (set s)
 
 // insertInto(set,Str)
 // - ensure that Str is in set
-void insertInto (set s, char *str)
+void insertInto (set s, char *str, int index)
 {
 	assert (s != NULL);
 	setLink curr, prev;
 	int found = findNode (s->elems, str, &curr, &prev);
-	if (found)
+	if (found) {
+		InsertIndex(curr, index);
 		return; // already in set
-
-	setLink new = newNode (str);
+	}
+	setLink new = newNode (str, index);
 	s->nelems++;
 	if (prev == NULL) {
 		// add at start of list of elems
@@ -116,7 +117,7 @@ void showSet (set s)
 		int id = 0;
 		curr = s->elems;
 		while (curr != NULL) {
-			printf ("[%03d] %s\n", id, curr->val);
+			printf ("[%03d] %s	index: %d index2:%d\n", id, curr->val, curr->position_original[0], curr->position_original[1]);
 			id++;
 			curr = curr->next;
 		}
@@ -125,12 +126,17 @@ void showSet (set s)
 
 // Helper functions
 
-static setLink newNode (char *str)
+static setLink newNode (char *str, int index)
 {
 	setLink new = malloc (sizeof (setNode));
 	assert (new != NULL);
 	new->val = strdup (str);
 	new->next = NULL;
+	new->position_original = calloc(MAX_FILE, sizeof(int));
+	new->position_original[0] = index;
+	new->P = 0;
+	new->weighetedResult = -1;
+	new->P = newIntList();
 	return new;
 }
 
@@ -156,4 +162,10 @@ static int findNode (setLink list, char *str, setLink *cur, setLink *pre)
 	*cur = curr;
 	*pre = prev;
 	return (curr != NULL && strEQ (str, curr->val));
+}
+
+void InsertIndex(setLink curr, int ind) {
+	int i = 0;
+	for (; i < ( curr->position_original[i] != '\0' ); i++);
+	curr->position_original[i] = ind;
 }
