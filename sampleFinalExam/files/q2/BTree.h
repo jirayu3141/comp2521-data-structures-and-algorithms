@@ -16,3 +16,11 @@ typedef struct Node {
    BTree left, right;
 } Node;
 
+
+int largest (BTree t) {
+    
+    //base case
+    if (t == NULL) {
+        return 0;
+    } else {
+         }
